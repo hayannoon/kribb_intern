@@ -28,24 +28,22 @@ def validation(filepath):  # 유효성 확인 함수
         length = 0
 
         for line in lines:  # 파일을 한줄한줄 순서대로 읽으며 반복문을 돈다.
-            if i % 4 == 2:  # 한 Read 내에서 두번째줄인경우
-                if '\n' in line:  # 개행이 섞여있다면 전체길이에서 1 뺀다.
-                    length = len(line) - 1
-                else:  # 개행 없으면 그대로 길이 저장
-                    length = len(line)
-                numberOfRead += 1  # 4줄중에서 한번진입하므로, Read수 1 증가
-                numberOfBase += length  # Base수는 sequence 길이만큼 증가
 
-                if (length % 4) != 0:  # 그리고 sequence가 4의 배수가 아닌경우
-                    flag = 1  # flag값 바꾸고
-                    print(str(filepath) + " #" + str((int(i / 4) + 1)) +
-                          " Read is NOT valid!!! (the number of read is " + str(length) + ")")
-                    # 유효하지 않다는 메시지 출력
-                # else:
-                #    print("#" + str(( int(i/4)+1) ) + " Read is valid")
-                i += 1
-            else:
-                i += 1
+                if i % 4 == 2:  # 한 Read 내에서 두번째줄인경우
+                    length = len(line.strip()) #strip함수로 마지막 개행문자 제거한뒤 길이계산
+                    numberOfRead += 1  # 4줄중에서 한번진입하므로, Read수 1 증가
+                    numberOfBase += length  # Base수는 sequence 길이만큼 증가
+                    if (length % 4) != 0:  # 그리고 sequence가 4의 배수가 아닌경우
+                        flag = 1  # flag값 바꾸고
+                        print(str(filepath) + " #" + str((int(i / 4) + 1)) +
+                              " Read is NOT valid!!! (the number of read is " + str(length) + ")")
+                        # 유효하지 않다는 메시지 출력
+                    # else:
+                    #    print("#" + str(( int(i/4)+1) ) + " Read is valid")
+                    i += 1
+                else:
+                    i += 1
+
 
         if flag == 0:  # flag값에 따라 유효성 여부 출력
             print("This file is VALID")
