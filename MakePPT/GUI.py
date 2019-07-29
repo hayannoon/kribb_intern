@@ -7,7 +7,7 @@ import os
 import sys
 import io
 import copy
-import makePPT_V2
+#import makePPT_V2
 
 sys.stdout = io.TextIOWrapper(sys.stdout.detach(), encoding = 'utf-8')
 sys.stderr = io.TextIOWrapper(sys.stderr.detach(), encoding = 'utf-8')
@@ -81,7 +81,7 @@ class MyApp(QWidget):
         end_value = str(end.text())
         title_value = str(title.text())
 
-        btn.clicked.connect(lambda: self.make(str(title.text()),str(cb.currentText()),str(chapter.text()),str(start.text()),str(end.text()),))
+        btn.clicked.connect(lambda: self.make(str(title.text()),str(cb.currentText()),str(chapter.text()),str(start.text()),str(end.text())))
 
         old.clicked.connect(lambda: self.radioButtonClickedOld(cb))
         #old.clicked.connect(self.radioButtonClickedOld)
@@ -110,6 +110,13 @@ class MyApp(QWidget):
         cp = QDesktopWidget().availableGeometry().center()
         qr.moveCenter(cp)
         self.move(qr.topLeft())
+
+    def makes(self,input_title, input_chapter, input_number, input_start, input_end):
+        print(input_title)
+        print(input_chapter)
+        print(str(input_number))
+        print(str(input_start))
+        print(str(object=input_end))
 
     def make(self,input_title, input_chapter, input_number, input_start, input_end):
         mytitle = input_title
@@ -178,11 +185,14 @@ class MyApp(QWidget):
             else:
                 count += 1
 
-        prs.save(Chapter + './' + str(mytitle) + '.pptx')
+        prs.save('output folder' + './' + str(mytitle) + '.pptx')
+
+
+
 
 if __name__ == '__main__':
 
     app = QApplication(sys.argv) #어플리케이션 객체 생성
     ex = MyApp()
-    ex.show()
+    #ex.show()
     sys.exit(app.exec_())
