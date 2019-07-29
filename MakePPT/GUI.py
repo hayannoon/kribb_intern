@@ -37,8 +37,9 @@ class MyApp(QWidget):
         old = QRadioButton('구약', self)
         new = QRadioButton('신약', self)
         pptPath = QLineEdit()
-        fileSearch = QPushButton("파일 찾기",self)
-
+        txtPath = QLineEdit()
+        fileSearch = QPushButton("PPT 파일 찾기",self)
+        wordsFileSearch = QPushButton("말씀 폴더 찾기",self)
 
         old.setChecked(True)
 
@@ -51,6 +52,7 @@ class MyApp(QWidget):
         grid.addWidget(QLabel('끝 절:'), 3, 0)
         grid.addWidget(QLabel('제목:'), 4, 0)
         grid.addWidget(QLabel('PPT 양식:'),5,0)
+        grid.addWidget(QLabel('말씀 폴더:'),6,0)
 
         old.move(60,20)
         new.move(120,20)
@@ -62,6 +64,8 @@ class MyApp(QWidget):
         grid.addWidget(title, 4, 1)
         grid.addWidget(pptPath,5,1)
         grid.addWidget(fileSearch,5,2)
+        grid.addWidget(txtPath,6,1)
+        grid.addWidget(wordsFileSearch,6,2)
 
         cb.activated[str].connect(self.onActivated)
 
@@ -74,10 +78,11 @@ class MyApp(QWidget):
         self.center() #센터 맞춘다.
 
         #이벤트 처리 설정
-        btn.clicked.connect(lambda: self.make(str(title.text()),str(cb.currentText()),str(chapter.text()),str(start.text()),str(end.text()),str(pptPath.text()) ) )
+        btn.clicked.connect(lambda: self.make(str(title.text()),str(cb.currentText()),str(chapter.text()),str(start.text()),str(end.text()),str(pptPath.text()),str(txtPath.text()) ) )
         old.clicked.connect(lambda: self.radioButtonClickedOld(cb))
         new.clicked.connect(lambda: self.radioButtonClickedNew(cb))
         fileSearch.clicked.connect(lambda: self.SearchButtonClicked(pptPath))
+        wordsFileSearch.clicked.connect(lambda: self.searchWordFileButtonClicked(txtPath))
 
         self.show() #창을 띄운다.
 
@@ -89,6 +94,10 @@ class MyApp(QWidget):
     def radioButtonClickedNew(self,combobox):
         combobox.clear()
         combobox.addItems(new_array)
+
+    def searchWordFileButtonClicked(self,path):
+        fname=QFileDialog.getExistingDirectory(self)
+        path.setText(fname)
 
     def SearchButtonClicked(self,path):
         fname = QFileDialog.getOpenFileName(self)
@@ -105,27 +114,24 @@ class MyApp(QWidget):
         self.move(qr.topLeft())
 
 
-    def make(self,input_title, input_chapter, input_number, input_start, input_end, input_pptPath):
+    def make(self,input_title, input_chapter, input_number, input_start, input_end, input_pptPath, input_txtPath):
         mytitle = input_title
         Chapter = input_chapter
         number = int(input_number)
         start = int(input_start)
         end = int(input_end)
         pPath = input_pptPath
+        tPath = input_txtPath
 
         print("Title : " + Chapter)
         print("<<< Start >>>")
         print()
 
-        txtName = Chapter + str(object=number) + "장"
-        #pptPath = "D:/minwoo/my_study/ppt_study/test.pptx"
         pptPath = input_pptPath
-        txtPath = txtName+'.txt'
+        txtName = Chapter + str(object=number) + "장"
+        txtPath = tPath+'/'+Chapter+'/'+ txtName+'.txt'
         txtPath = os.path.abspath(txtPath)
 
-        name = str(copy.deepcopy(txtPath).rsplit('\\', 1)[1].split('.')[0])
-
-        print(name)
         words = []
 
         try:
