@@ -70,7 +70,7 @@ class MyApp(QWidget):
         cb.activated[str].connect(self.onActivated)
 
         btn = QPushButton('Start', self)
-        btn.move(400,440)
+        btn.move(400,450)
 
         self.setWindowTitle('making ppt Automation program - Omega Church')
         self.setWindowIcon(QIcon('omega_logo.png'))
