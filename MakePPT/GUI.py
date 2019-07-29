@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 from pptx import Presentation
-from PyQt5.QtWidgets import (QApplication, QComboBox, QVBoxLayout,QWidget, QPushButton, QDesktopWidget,QGridLayout, QLabel, QLineEdit,QRadioButton)
+from PyQt5.QtWidgets import (QApplication,QFileDialog, QComboBox, QVBoxLayout,QWidget, QPushButton, QDesktopWidget,QGridLayout, QLabel, QLineEdit,QRadioButton)
 from PyQt5.QtGui import QIcon, QFont
 from PyQt5.QtCore import QCoreApplication
 import os
@@ -21,7 +21,6 @@ class MyApp(QWidget):
 
     def __init__(self):
         super().__init__()
-
         self.initUI()
 
     def initUI(self):
@@ -37,6 +36,8 @@ class MyApp(QWidget):
         title = QLineEdit(self)
         old = QRadioButton('구약', self)
         new = QRadioButton('신약', self)
+        pptPath = QLineEdit()
+        fileSearch = QPushButton("파일 찾기",self)
 
 
         old.setChecked(True)
@@ -49,6 +50,7 @@ class MyApp(QWidget):
         grid.addWidget(QLabel('시작 절:'), 2, 0)
         grid.addWidget(QLabel('끝 절:'), 3, 0)
         grid.addWidget(QLabel('제목:'), 4, 0)
+        grid.addWidget(QLabel('PPT 양식:'),5,0)
 
         old.move(60,20)
         new.move(120,20)
@@ -58,6 +60,8 @@ class MyApp(QWidget):
         grid.addWidget(start, 2, 1)
         grid.addWidget(end, 3, 1)
         grid.addWidget(title, 4, 1)
+        grid.addWidget(pptPath,5,1)
+        grid.addWidget(fileSearch,5,2)
 
         cb.activated[str].connect(self.onActivated)
 
@@ -70,9 +74,10 @@ class MyApp(QWidget):
         self.center() #센터 맞춘다.
 
         #이벤트 처리 설정
-        btn.clicked.connect(lambda: self.make(str(title.text()),str(cb.currentText()),str(chapter.text()),str(start.text()),str(end.text())))
+        btn.clicked.connect(lambda: self.make(str(title.text()),str(cb.currentText()),str(chapter.text()),str(start.text()),str(end.text()),str(pptPath.text()) ) )
         old.clicked.connect(lambda: self.radioButtonClickedOld(cb))
         new.clicked.connect(lambda: self.radioButtonClickedNew(cb))
+        fileSearch.clicked.connect(lambda: self.SearchButtonClicked(pptPath))
 
         self.show() #창을 띄운다.
 
@@ -85,7 +90,9 @@ class MyApp(QWidget):
         combobox.clear()
         combobox.addItems(new_array)
 
-
+    def SearchButtonClicked(self,path):
+        fname = QFileDialog.getOpenFileName(self)
+        path.setText(fname[0])
 
     def onActivated(self, text):
         self.lbl.setText(text)
@@ -97,28 +104,22 @@ class MyApp(QWidget):
         qr.moveCenter(cp)
         self.move(qr.topLeft())
 
-    def makes(self,input_title, input_chapter, input_number, input_start, input_end):
-        print(input_title)
-        print(input_chapter)
-        print(str(input_number))
-        print(str(input_start))
-        print(str(object=input_end))
 
-    def make(self,input_title, input_chapter, input_number, input_start, input_end):
+    def make(self,input_title, input_chapter, input_number, input_start, input_end, input_pptPath):
         mytitle = input_title
         Chapter = input_chapter
         number = int(input_number)
         start = int(input_start)
         end = int(input_end)
-
+        pPath = input_pptPath
 
         print("Title : " + Chapter)
         print("<<< Start >>>")
         print()
 
         txtName = Chapter + str(object=number) + "장"
-        pptPath = "D:/minwoo/my_study/ppt_study/test.pptx"
-
+        #pptPath = "D:/minwoo/my_study/ppt_study/test.pptx"
+        pptPath = input_pptPath
         txtPath = txtName+'.txt'
         txtPath = os.path.abspath(txtPath)
 
