@@ -7,7 +7,6 @@ import os
 import sys
 import io
 import copy
-#import makePPT_V2
 
 sys.stdout = io.TextIOWrapper(sys.stdout.detach(), encoding = 'utf-8')
 sys.stderr = io.TextIOWrapper(sys.stderr.detach(), encoding = 'utf-8')
@@ -17,11 +16,7 @@ old_array = ['창세기','출애굽기','레위기','민수기','신명기','여
                '하박국','스바냐','학개','스가랴','말라기']
 new_array = ['마태복음','마가복음','누가복음','요한복음','사도행전','로마서','고린도전서','고린도후서','갈라디아서','에베소서','빌립보서','골로새서','데살로니가전서','데살로니가후서',
              '디모데전서','디모데후서','디도서','빌레몬서','히브리서','야고보서','베드로전서','베드로후서','요한일서','요한이서','요한삼서','유다서','요한계시록']
-cb_value = ""
-start_value = ""
-chapter_value = ""
-end_value = ""
-title_value = ""
+
 class MyApp(QWidget):
 
     def __init__(self):
@@ -31,7 +26,7 @@ class MyApp(QWidget):
 
     def initUI(self):
 
-        self.lbl = QLabel('',self)
+        self.lbl = QLabel('말씀 선택',self)
         self.lbl.move(0,0)
         cb = QComboBox(self)
         cb.addItems(old_array)
@@ -57,8 +52,7 @@ class MyApp(QWidget):
 
         old.move(60,20)
         new.move(120,20)
-        #grid.addWidget(old,0,1)
-        #grid.addWidget(new,0,2)
+
         grid.addWidget(cb, 0, 1)
         grid.addWidget(chapter, 1, 1)
         grid.addWidget(start, 2, 1)
@@ -75,19 +69,11 @@ class MyApp(QWidget):
         self.resize(900, 490) #사이즈 조절
         self.center() #센터 맞춘다.
 
-        cb_value = str(cb.currentText())
-        chapter_value = str(chapter.text())
-        start_value = str(start.text())
-        end_value = str(end.text())
-        title_value = str(title.text())
-
+        #이벤트 처리 설정
         btn.clicked.connect(lambda: self.make(str(title.text()),str(cb.currentText()),str(chapter.text()),str(start.text()),str(end.text())))
-
         old.clicked.connect(lambda: self.radioButtonClickedOld(cb))
-        #old.clicked.connect(self.radioButtonClickedOld)
         new.clicked.connect(lambda: self.radioButtonClickedNew(cb))
 
-        print('open')
         self.show() #창을 띄운다.
 
 
@@ -124,11 +110,8 @@ class MyApp(QWidget):
         number = int(input_number)
         start = int(input_start)
         end = int(input_end)
-        '''
-        장 마다 바꿔주어야 할 값은 위의 두 값밖에 없다. 대신 값들은 정확해야한다.
-        Chapter = 장 이름
-        howMany = 장 수
-        '''
+
+
         print("Title : " + Chapter)
         print("<<< Start >>>")
         print()
@@ -138,8 +121,6 @@ class MyApp(QWidget):
 
         txtPath = txtName+'.txt'
         txtPath = os.path.abspath(txtPath)
-
-        print(txtPath)
 
         name = str(copy.deepcopy(txtPath).rsplit('\\', 1)[1].split('.')[0])
 
@@ -169,7 +150,6 @@ class MyApp(QWidget):
 
         # 인자로 불러올 파일 경로를 넣어줄 수 있다. 인자 없으면 현재 경로에 새롭게 생성
         prs = Presentation(pptPath)
-        #prs = Presentation(pptPath)
         title_slide_layout = prs.slide_layouts[0]  # 제목 슬라이드 레이아웃 지정 Layout 0번이다.
         count=1
         for contents in words:
@@ -184,10 +164,7 @@ class MyApp(QWidget):
                 count += 1
             else:
                 count += 1
-
         prs.save('output folder' + './' + str(mytitle) + '.pptx')
-
-
 
 
 if __name__ == '__main__':
