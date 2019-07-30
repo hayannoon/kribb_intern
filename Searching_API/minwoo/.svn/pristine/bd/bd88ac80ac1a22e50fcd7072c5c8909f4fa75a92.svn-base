@@ -1,0 +1,136 @@
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.Scanner;
+import java.util.StringTokenizer;
+
+public class Main {
+
+	public static String url_head = "http://fast.ntis.go.kr/apis/service/search/project?userKey=821614f489a22930b4971025776fb4b2e2b0cc3d&query=";
+	public static String url_tail = "&displayCount=100&startPosition=1&sortby=-new";
+
+	// public static String num_url =
+	// "http://fast.ntis.go.kr/apis/service/search/project?userKey=821614f489a22930b4971025776fb4b2e2b0cc3d&query="
+	// + "%s&displayCount=1&startPosition=1&sortby=-new";
+
+	public static Scanner sc = new Scanner(System.in);
+	private static boolean hasAnd = false;  //검색어에 And 연산자가 있는지 여부를 저장할 변수
+	private static boolean hasOr = false;	//검색어에 Or 연산자가 있는지 여부를 저장할 변수
+	static String input = null;
+
+	
+	
+	//input값에 연산자가 들어있는지 확인한다.
+	static void checkSearchingOperator(String input) {
+		if (input.contains("+"))
+			hasAnd = true;
+		if (input.contains("|"))
+			hasOr = true;
+	}
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		int howMany = 0; //토큰의 개수 저장 변수
+		String output = ""; //반환 String 변수
+		String[] temp = new String[10]; //output을 만들기위해 임시로 사용하는 배열
+
+		System.out.println("검색어 입력 : ");
+		input = sc.nextLine(); // 문자열 입력
+		checkSearchingOperator(input); // 문자열 확인
+
+		
+		//연산자의 종류에 따라서 검색어를 자르고, temp라는 배열에 각 토큰들을 저장한다.
+		if (hasAnd) { // "+" 기호가 들어온 경우
+			StringTokenizer tokens = new StringTokenizer(input, "+");
+			for (int i = 0; tokens.hasMoreElements(); i++) {
+				temp[i] = new String(tokens.nextToken());
+				howMany++;
+			}
+		} else if (hasOr) {
+			StringTokenizer tokens = new StringTokenizer(input, "|");
+			for (int i = 0; tokens.hasMoreElements(); i++) {
+				temp[i] = new String(tokens.nextToken());
+				howMany++;
+			}
+			// 이 과정이 끝나면 배열에 + 혹은 |를 기준으로 잘린 조각들이 들어있다.
+		} else { //연산자 없는경우
+			temp[0] = new String(input);
+			howMany++;
+		}
+
+		
+		
+		// 검색어필드 안넣은경우 defalut 로 bi 필드를 넣어준다.
+		for (int i = 0; i < howMany; i++) {
+			if (!(temp[i].contains(":"))) {
+				temp[i] = "bi:" + temp[i]; 
+			}
+		}
+		// 이 과정이 끝나면 각 토큰은 모두 : 을 포함하게 된다.
+		
+		
+		//각 토큰을 돌면서 검색어 필드가 안들어간 토큰을 찾아서 디폴트값인 bi: 를 넣어주면서 형식 만들어준다.
+		for (int i = 0; i < howMany; i++) {
+			StringTokenizer tokens = new StringTokenizer(temp[i], ":");
+			String tmp1 = tokens.nextToken();
+			if ((!Field.isMember(tmp1))) {
+				temp[i] = "bi:(" + tokens.nextToken().trim() + ")";
+			} // Field가 메뉴얼에 있는지 확인하고 없으면 디폹트값인 bi 적용
+			else {
+				temp[i] = tmp1 + ":(" + tokens.nextToken().trim() + ")";
+			}
+		}
+		// 여기까지 하면 temp에 완성된 token들이 잘 들어가있다.
+		
+		
+
+//		for (int i = 0; i < howMany; i++) {
+//			try {
+//				temp[i] = URLEncoder.encode(temp[i], "UTF-8");
+//				// encoding해서 query에 저장
+//			} catch (UnsupportedEncodingException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//		}
+//		
+		//output file에 urlhead 저장하고
+		output = new String(url_head);
+		if (hasAnd) { //And인 경우
+			for (int i = 0; i < howMany; i++) {
+				if (i != 0) {
+					output = output.concat(" and "); // 맨 처음은 and 붙으면 안된다.
+				}
+				output = output.concat(temp[i]);
+			}
+		} else if (hasOr) { //or인 경우
+			for (int i = 0; i < howMany; i++) {
+				if (i != 0) {
+					output = output.concat(" or "); // 맨 처음은 and 붙으면 안된다.
+				}
+				output = output.concat(temp[i]);
+			}
+		} else { //연산자 없는 경우
+			output = output.concat(temp[0]);
+		}
+		output = output.concat(url_tail);
+
+		
+		output = output.replaceAll("  ", " ");
+		//공백이 두번들어갔다면 줄여준다.
+		
+		
+//		
+//		try {
+//			output= URLEncoder.encode(output, "UTF-8");
+//			// encoding해서 query에 저장
+//		} catch (UnsupportedEncodingException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//	
+		
+		System.out.println(output);
+
+	}
+
+}
