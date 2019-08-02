@@ -1,0 +1,5 @@
+org\kobic\ntis\ResultModel.class
+org\kobic\ntis\Field.class
+org\kobic\ntis\NTISCommon.class
+org\kobic\ntis\NTISDataParser.class
+org\kobic\ntis\App.class
