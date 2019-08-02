@@ -10,24 +10,33 @@ import org.springframework.web.bind.annotation.RestController;
 @EnableAutoConfiguration
 public class RequestMap {
 
-	@RequestMapping("/")
+	@RequestMapping("/") // 루트 페이지
 	String home() {
-		return "THIS IS NRIS SEARCHING API HOME <br><br>Usage: current url/search/{key words}";
+		return "THIS IS NTIS SEARCHING API HOME <br><br>Usage: current url/search/{key words}";
 	}
 
-	
-	@RequestMapping("/search/{url}")
-	public JSONArray test(@PathVariable("url") String url) {
+	@RequestMapping("/search/{keyWord}")
+	/*
+	 * url/search/ 입력시 XML Data 가져오도록 맵핑
+	 */
+	public JSONArray search(@PathVariable("keyWord") String keyWord) {
 
 		NTISCommon common = new NTISCommon();
 
-		return common.getNtisXmlDataFile(url);
+		return common.getNtisXmlDataFile(keyWord);
 	}
-	
-	
-	@RequestMapping("/Swagger/{name}")
-	public String swagger(@PathVariable("name") String name) {
-		
-		return "Swagger Test: " + name;
+
+	//@RequestMapping("/search/{keyWord}/displaycount/{displayCount}/startposition/{startPosition}")
+	@RequestMapping("/search/{keyWord}/{displayCount}/{startPosition}")	
+	public JSONArray modifiedSearch(
+			@PathVariable("keyWord") String keyWord,
+			@PathVariable("displayCount") String displayCount,
+			@PathVariable("startPosition") String startPosition) {
+			
+			NTISCommon common = new NTISCommon();
+			
+			return common.getNtisXmlDataFile(keyWord,displayCount,startPosition);
+			
 	}
+
 }
