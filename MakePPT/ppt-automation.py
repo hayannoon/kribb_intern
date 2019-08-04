@@ -31,7 +31,7 @@ class MyApp(QWidget):
 
     def initUI(self):
 
-        self.lbl = QLabel('말씀 선택',self)
+        self.lbl = QLabel('  말씀 선택',self)
         self.lbl.move(0,0)
         cb = QComboBox(self)
         cb.addItems(old_array)
@@ -46,45 +46,56 @@ class MyApp(QWidget):
         txtPath = QLineEdit()
         fileSearch = QPushButton("PPT 파일 찾기",self)
         wordsFileSearch = QPushButton("말씀 폴더 찾기",self)
+        layoutNumber = QLineEdit(self)
+        btn = QPushButton('Start', self)
+        fileName = QLineEdit(self)
 
         old.setChecked(True)
 
         grid = QGridLayout()
         self.setLayout(grid)
 
-        grid.addWidget(QLabel('말씀:'), 0, 0)
-        grid.addWidget(QLabel('장:'), 1, 0)
-        grid.addWidget(QLabel('시작 절:'), 2, 0)
-        grid.addWidget(QLabel('끝 절:'), 3, 0)
-        grid.addWidget(QLabel('제목:'), 4, 0)
-        grid.addWidget(QLabel('PPT 양식:'),5,0)
-        grid.addWidget(QLabel('말씀 폴더:'),6,0)
 
-        old.move(60,20)
-        new.move(120,20)
+        grid.addWidget(QLabel('말씀:'), 1, 0)
+        grid.addWidget(QLabel('장:'), 2, 0)
+        grid.addWidget(QLabel('시작 절:'), 3, 0)
+        grid.addWidget(QLabel('끝 절:'), 4, 0)
+        grid.addWidget(QLabel('제목:'), 5, 0)
+        grid.addWidget(QLabel('PPT 양식:'),6,0)
+        grid.addWidget(QLabel('PPT 레이아웃 번호:'),7,0)
+        grid.addWidget(QLabel('말씀 폴더:'),8,0)
+        grid.addWidget(QLabel('파일 이름:'),9,0)
 
-        grid.addWidget(cb, 0, 1)
-        grid.addWidget(chapter, 1, 1)
-        grid.addWidget(start, 2, 1)
-        grid.addWidget(end, 3, 1)
-        grid.addWidget(title, 4, 1)
-        grid.addWidget(pptPath,5,1)
-        grid.addWidget(fileSearch,5,2)
-        grid.addWidget(txtPath,6,1)
-        grid.addWidget(wordsFileSearch,6,2)
+        old.move(120,0)
+        new.move(180,0)
+
+        grid.addWidget(cb, 1, 1)
+        grid.addWidget(chapter, 2, 1)
+        grid.addWidget(start, 3, 1)
+        grid.addWidget(end, 4, 1)
+        grid.addWidget(title, 5, 1)
+        grid.addWidget(pptPath,6,1)
+        grid.addWidget(fileSearch,6,2)
+        grid.addWidget(layoutNumber,7,1)
+        grid.addWidget(txtPath,8,1)
+        grid.addWidget(wordsFileSearch,8,2)
+        grid.addWidget(fileName,9,1)
+
+        grid.addWidget(btn,10,1)
+        layoutNumber.setText('6')
 
         cb.activated[str].connect(self.onActivated)
 
-        btn = QPushButton('Start', self)
-        btn.move(400,440)
+
+        #btn.move(450,510)
 
         self.setWindowTitle('making ppt Automation program - Omega Church')
         self.setWindowIcon(QIcon('omega_logo.png'))
-        self.resize(900, 490) #사이즈 조절
+        self.resize(1000, 600) #사이즈 조절
         self.center() #센터 맞춘다.
 
         #이벤트 처리 설정
-        btn.clicked.connect(lambda: self.make(str(title.text()),str(cb.currentText()),str(chapter.text()),str(start.text()),str(end.text()),str(pptPath.text()),str(txtPath.text()) ) )
+        btn.clicked.connect(lambda: self.make(str(title.text()),str(cb.currentText()),str(chapter.text()),str(start.text()),str(end.text()),str(pptPath.text()),str(txtPath.text()),str(layoutNumber.text()),str(fileName.text()) ) )
         old.clicked.connect(lambda: self.radioButtonClickedOld(cb))
         new.clicked.connect(lambda: self.radioButtonClickedNew(cb))
         fileSearch.clicked.connect(lambda: self.SearchButtonClicked(pptPath))
@@ -120,22 +131,17 @@ class MyApp(QWidget):
         self.move(qr.topLeft())
 
     def makeEnter_eng(self,words):
-        if len(words) > 95:
-            if len(words)>190:
-                if len(words)>285:
-                    words = words[:95]+'\n'+words[95:]
-                    words = words[:190]+'\n'+words[190:]
-                    words = words[:285]+'\n'+words[285:]
-            else:
-                words = words[:95]+'\n'+words[95:]
-                words = words[:190]+'\n'+words[190:]
-        else:
-            words = words[:95]+'\n'+words[95:]
+        length = len(words)
+        rotation = int(length)/95
+        i = 0
+        while i < rotation:
+            words = words[:(95*(i+1))] + '\n' + words[(95*(i+1)):]
+            i += 1
         return words
 
 
 
-    def make(self,input_title, input_chapter, input_number, input_start, input_end, input_pptPath, input_txtPath):
+    def make(self,input_title, input_chapter, input_number, input_start, input_end, input_pptPath, input_txtPath, input_layoutNumber, input_fileName):
         mytitle = input_title
         Chapter = input_chapter
         number = int(input_number)
@@ -179,8 +185,8 @@ class MyApp(QWidget):
 
 
         try: #디렉터리 생성
-            if not(os.path.isdir('output folder')):
-                os.makedirs(os.path.join('output folder'))
+            if not(os.path.isdir('결과 폴더')):
+                os.makedirs(os.path.join('결과 폴더'))
         except OSError as e:
             if e.errno != errno.EEXIST:
                 print("Failed to create directory!!!!!")
@@ -189,19 +195,25 @@ class MyApp(QWidget):
 
         # 인자로 불러올 파일 경로를 넣어줄 수 있다. 인자 없으면 현재 경로에 새롭게 생성
         prs = Presentation(pptPath)
-        title_slide_layout = prs.slide_layouts[6]  # 제목 슬라이드 레이아웃 지정 Layout 0번이다.
+        title_slide_layout = prs.slide_layouts[int(input_layoutNumber)]  # 제목 슬라이드 레이아웃 지정 Layout 0번이다.
         count=1
         for contents in words_kor:
             (verse, word_kor) = contents.split('.', 1)
             if len(word_kor) > 46:
                 if len(word_kor)>92:
                     if len(word_kor)>138:
+                        if len(word_kor)>184:
+                            word_kor = word_kor[:46]+'\n'+word_kor[46:]
+                            word_kor = word_kor[:93]+'\n'+word_kor[93:]
+                            word_kor = word_kor[:139]+'\n'+word_kor[139:]
+                            word_kor = word_kor[:185]+'\n'+word_kor[185:]
+                    else:
                         word_kor = word_kor[:46]+'\n'+word_kor[46:]
-                        word_kor = word_kor[:92]+'\n'+word_kor[92:]
-                        word_kor = word_kor[:138]+'\n'+word_kor[138:]
+                        word_kor = word_kor[:93]+'\n'+word_kor[93:]
+                        word_kor = word_kor[:139]+'\n'+word_kor[139:]
                 else:
                     word_kor = word_kor[:46]+'\n'+word_kor[46:]
-                    word_kor = word_kor[:92]+'\n'+word_kor[92:]
+                    word_kor = word_kor[:93]+'\n'+word_kor[93:]
             else:
                 word_kor = word_kor[:46]+'\n'+word_kor[46:]
 
@@ -242,18 +254,17 @@ class MyApp(QWidget):
                 height = Inches(0.64)
                 textbox3 = shapes.add_textbox(left,top,width,height)
                 textframe3 = textbox3.text_frame
-                engValue = self.makeEnter_eng(str(words_eng[count-1].split('.')[1]).strip())
+                engValue = self.makeEnter_eng(str(words_eng[count-1].split('.',1)[1]).strip())
                 textframe3.paragraphs[0].text = str(engValue)
                 textframe3.paragraphs[0].font.size = Pt(16)
                 textframe3.paragraphs[0].font.name = "나눔고딕"
                 textframe3.paragraphs[0].font.color.rgb=RGBColor(0xFF,0xFF,0xFF)
 
-
                 count += 1
             else:
                 count += 1
-        forSaveName = datetime.now()
-        prs.save('output folder' + './' + str(forSaveName.year)+'-'+str(forSaveName.month)+'-'+str(forSaveName.day)+ '.pptx')
+
+        prs.save('결과 폴더' + './' + str(input_fileName)+ '.pptx')
 
 
 if __name__ == '__main__':
